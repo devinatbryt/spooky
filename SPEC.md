@@ -12,6 +12,9 @@ branches merge into `main` and the joined app is the demo.
 This spec describes **behaviour**. Which primitive, which Effect combinator and
 which Kobalte part you use is the exercise.
 
+**Rotations 1–3 are a complete result.** Rotation 4 is a stretch: do it if
+you get there, and don't rush 1–3 to reach it.
+
 ---
 
 ## The shared contract (frozen on `main`)
@@ -107,7 +110,7 @@ one.
 - [ ] Hand-edit the URL to `?species=dragon`: you see an `InvalidSearch`
       message with a **Reset filters** button, not the app-wide error screen.
 
-### Rotation 4: make it honest
+### Rotation 4 (stretch): make it honest
 
 - [ ] Chaos Panel at **1500ms**. The first load shows skeletons; *changing a
       filter* keeps the current results on screen, visibly stale, until the
@@ -187,7 +190,7 @@ A form for adopting one monster, with rules, a flaky third party, and a race.
 - [ ] Before submitting, a Kobalte **Dialog** asks "Adopt Count Snackula?
       This is permanent." Confirm submits; cancel does nothing.
 
-### Rotation 4: make it honest
+### Rotation 4 (stretch): make it honest
 
 - [ ] Chaos Panel at **1500ms / 30%**. While an application is in flight,
       the form shows it deliberately and cannot be submitted twice.

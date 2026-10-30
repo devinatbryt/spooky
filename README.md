@@ -64,7 +64,7 @@ doesn't touch the keyboard. **Swap every 30 minutes.**
 | 1 (0–30) | **Backend.** The Effect service, its Schema and typed errors; turn the `it.todo`s into passing tests. |
 | 2 (30–60) | **First screen.** Server functions and the page, with Kobalte. |
 | 3 (60–90) | **The hard part.** Catalog: URL-synced filters. Desk: retries, timeout, the race. |
-| 4 (90–120) | **Make it honest** at 1500ms / 30%, then a bonus. |
+| 4 (90–120) | **Stretch: make it honest** at 1500ms / 30%, then a bonus. Rotations 1–3 are a complete result. |
 | +15 min | **Merge both branches into `main` and walk through the demo** (`SPEC.md` → Definition of done). |
 
 ---
