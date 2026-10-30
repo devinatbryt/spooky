@@ -46,7 +46,9 @@ utility string you can paste. Spend the session on behaviour, not padding.
 - Listbox option: `cursor-pointer rounded-md px-3 py-1.5 outline-none data-highlighted:bg-accent/20 data-selected:text-accent`
 - Tab list: `flex gap-1 rounded-lg bg-surface p-1`
 - Tab: `rounded-md px-3 py-1.5 text-sm text-muted data-selected:bg-surface-3 data-selected:text-white`
+- Pager root (Kobalte renders a `<ul>` you can't class): `flex justify-center [&>ul]:flex [&>ul]:items-center [&>ul]:gap-1`
 - Pager item: `size-9 rounded-lg border border-line text-sm aria-[current=page]:border-accent aria-[current=page]:text-accent`
+- Pager prev/next: `rounded-lg border border-line px-3 py-1.5 text-sm data-disabled:opacity-40`
 - Checkbox box: `grid size-5 place-items-center rounded border border-line data-checked:border-accent data-checked:bg-accent text-surface`
 - Dialog overlay: `fixed inset-0 z-50 bg-black/60 backdrop-blur-sm`
 - Dialog panel: `fixed top-1/2 left-1/2 z-50 w-[min(28rem,90vw)] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-line bg-surface-2 p-6 shadow-2xl`

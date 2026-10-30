@@ -73,9 +73,10 @@ one.
 - [ ] It returns one page of **8** monsters plus enough to draw a pager: the
       total match count and the page count.
 - [ ] A name search is case-insensitive and matches part of a name.
-- [ ] Input that does not decode (`species=dragon`, `page=-3`, `page=abc`)
-      fails with a typed **`InvalidSearch`** error. A page past the end is
-      *not* an error; it is just empty.
+- [ ] Input that does not decode (`species=dragon`, `page=0`, `page=1.5`,
+      `page=abc`) fails with a typed **`InvalidSearch`** error. A page must
+      be a whole number ≥ 1. A page past the end is *not* an error; it is
+      just empty.
 - [ ] **Detail** returns one monster by id, or fails with `MonsterNotFound`.
 - [ ] Every `it.todo` in `src/catalog/catalog.test.ts` is a real passing test.
 
@@ -216,7 +217,10 @@ he's on the **Adopted** tab. If that walk-through works, the agency is open.
 ## Rules of engagement
 
 1. **Stay in your folders.** Your slice folder, your route folder, your one
-   layer file. That is what makes the merge free.
+   layer file. That is what makes the merge free. The one exception is
+   `file-routes.d.ts`, which the toolchain regenerates when a route starts
+   exporting `route`. If it conflicts at the merge, take either side and run
+   `pnpm build` to regenerate it.
 2. **`src/example/` and `/example` are reference material.** Copy the
    *shape*, not the code. It is pumpkins on purpose.
 3. **Turn the Chaos Panel up before you trust anything.** At 0ms every async

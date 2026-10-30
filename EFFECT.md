@@ -131,7 +131,8 @@ const Application = Schema.Struct({
   name: Schema.Trim.pipe(Schema.check(Schema.isMinLength(2), Schema.isMaxLength(40))),
   housing: Housing,                                   // a Literals schema
   page: Schema.optional(Schema.NumberFromString),     // "3" -> 3, may be absent
-  agree: Schema.optional(Schema.Literal("on")),       // an HTML checkbox: "on" or absent
+  agree: Schema.optional(Schema.NullOr(Schema.Literal("on"))),
+  // ^ an HTML checkbox: "on" when ticked; form.get() gives null when not
 });
 type Application = typeof Application.Type;
 
@@ -153,9 +154,10 @@ const format = SchemaIssue.makeFormatterStandardSchemaV1();
 const [first] = format(error.issue).issues;   // { message, path }
 ```
 
-**FormData:** `form.get("x")` is `string | File | null`. A missing field is
-`null`, not `undefined`, so build a plain object from the fields you expect
-before decoding.
+**FormData:** `form.get("x")` is `string | File | null`. A missing field (an
+unticked checkbox, too) is **`null`, not `undefined`**, and `Schema.optional`
+alone rejects `null`. Build a plain object from the fields you expect, and
+wrap anything that can be absent in `Schema.NullOr(...)`.
 
 ---
 
@@ -233,8 +235,14 @@ it.effect("names the field", () =>
   yield* TestClock.adjust("3 seconds");
   const error = yield* Fiber.join(fiber);
   ```
-- Build `TestLayer` from your real layer plus fakes:
-  `AdoptionDesk.layer.pipe(Layer.provide(Layer.mergeAll(FakeCheck, MonsterRepo.layer)), Layer.provide(Chaos.layer))`.
+- `TestClock.adjust` only fires sleeps that are **already scheduled** when you
+  call it. Work that sleeps in stages (a slow fake, then a retry backoff, then
+  another try) needs several smaller adjusts. For a test that's really about
+  concurrency (the race), `it.live` runs on the real clock and is simpler.
+- Build `TestLayer` from your real layer plus fakes. Use **`provideMerge`**
+  so the test can still reach `Chaos` (for example, to turn latency up and
+  widen a race window):
+  `AdoptionDesk.layer.pipe(Layer.provideMerge(Layer.mergeAll(FakeCheck, MonsterRepo.layer)), Layer.provideMerge(Chaos.layer))`.
   Note: `MonsterRepo.layer` needs `Chaos`.
 - A fake that fails twice then passes needs state: a `Ref` counter inside
   the fake's `run`.
@@ -252,7 +260,12 @@ export const getThing = query(async (id: string) => {
 ```
 
 One line per server function. Validation, rules and state live in the
-service, never in the server function. `runServer` only accepts effects whose
+service, never in the server function.
+
+Arguments to a server function are sent as **JSON**. An object holding an
+`undefined` value is refused ("not JSON-serializable"), but only on
+client-side calls, because the first SSR render calls the function directly.
+Leave absent keys out. `runServer` only accepts effects whose
 requirements the app runtime can satisfy, so a type error there usually means
 "you forgot to register your layer in your slot file".
 

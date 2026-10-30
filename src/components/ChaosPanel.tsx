@@ -7,7 +7,7 @@
 //
 // It is also an example of a server read (getChaos) mirrored into local
 // signals, so a control can move before the server has answered.
-import { createEffect, createMemo, createSignal, createUniqueId } from 'solid-js';
+import { createEffect, createMemo, createSignal, createUniqueId, onSettled } from 'solid-js';
 
 import { getChaos, updateChaos } from '../lib/chaos';
 
@@ -85,6 +85,17 @@ function ChaosSlider(props: {
   onCommit: (value: number) => void;
 }) {
   const id = createUniqueId();
+
+  // Each arrow-key press fires its own `change`, and separate requests can
+  // land out of order — so commits are debounced: only the value the slider
+  // settles on is sent.
+  let pending: ReturnType<typeof setTimeout> | undefined;
+  const commit = (value: number) => {
+    clearTimeout(pending);
+    pending = setTimeout(() => props.onCommit(value), 250);
+  };
+  onSettled(() => () => clearTimeout(pending));
+
   return (
     <div class="flex flex-col gap-2">
       <label for={id} class="flex justify-between text-muted">
@@ -93,7 +104,8 @@ function ChaosSlider(props: {
       </label>
       {/* A native range input on purpose: Kobalte's Slider ignores keyboard
           and pointer input in 2.0.0-alpha.4 (see KOBALTE.md). `onInput` moves
-          the local value; `onChange` fires on release and commits it. */}
+          the local value; `onChange` fires on release (or per key press) and
+          schedules the commit. */}
       <input
         id={id}
         type="range"
@@ -103,7 +115,7 @@ function ChaosSlider(props: {
         value={props.value}
         class={['w-full', props.fill]}
         onInput={(event) => props.onInput(event.currentTarget.valueAsNumber)}
-        onChange={(event) => props.onCommit(event.currentTarget.valueAsNumber)}
+        onChange={(event) => commit(event.currentTarget.valueAsNumber)}
       />
     </div>
   );

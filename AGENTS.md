@@ -56,8 +56,13 @@ package), especially "What changed from 1.x". Gone or renamed: `createResource`,
 
 **Router is 2.0.0-next.41:** `action` was renamed **`formAction`**;
 `useSubmission` became `useSubmissions` (settled submissions only); forms get
-`aria-busy` automatically while in flight. Calling a server function directly
-from a handler is fine; the router revalidates after any POST call.
+`aria-busy` automatically while in flight (styling only; it doesn't block a
+second submit). Calling a server function directly from a handler is fine.
+The router revalidates every on-screen `query` after a *successful* POST call,
+but not after a failed one. `useSearchParams` values are held until the
+navigation's data lands; read `latest(() => params.x)` for the in-flight
+value. Server-function arguments are JSON, so `undefined` values are rejected.
+See README → "Solid 2 is not Solid 1" for the full list.
 
 **Kobalte is 2.0.0-alpha.4:** per-component imports only
 (`@kobalte/core/select`). The Slider is broken. `STRICT_READ_UNTRACKED` in

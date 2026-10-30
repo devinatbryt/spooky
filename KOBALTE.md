@@ -62,6 +62,11 @@ a `name` and it posts with a `<form>` like a native input.
 - **Pagination**: `Pagination` (`count`, `page`, `onPageChange`,
   `itemComponent`, `ellipsisComponent`) › `.Previous`, `.Items`, `.Next`.
   `itemComponent={(p) => <Pagination.Item page={p.page}>{p.page}</Pagination.Item>}`.
+  **Gotcha:** the root renders `<nav><ul>…</ul></nav>`, and you can't put a
+  class on the `<ul>`, so items stack vertically. Style it from the root with
+  `[&>ul]:flex [&>ul]:items-center [&>ul]:gap-1`. The current item gets
+  `aria-current="page"` and `data-current`; Previous/Next get `disabled` and
+  `data-disabled` at the ends.
 
 **The Adoption Desk:**
 - **RadioGroup**: `RadioGroup` (`name`, `value`/`defaultValue`) › `.Label`,
@@ -72,9 +77,11 @@ a `name` and it posts with a `<form>` like a native input.
   box posts `name=on`; an unchecked one posts **nothing** (standard HTML).
 - **Dialog**: `Dialog` (`open`, `onOpenChange`) › `.Trigger`; `.Portal` ›
   `.Overlay`, `.Content` › `.Title`, `.Description`, `.CloseButton`.
-  **Gotcha:** `.Portal` renders at the end of `<body>`, *outside* your
-  `<form>`. A submit button inside the dialog needs `form="your-form-id"` to
-  submit that form.
+  **Gotchas:** `.Portal` renders at the end of `<body>`, *outside* your
+  `<form>`, so a submit button inside the dialog needs `form="your-form-id"`
+  to submit that form. And pressing **Enter** in a text field submits the
+  form directly, skipping your confirm dialog, unless you intercept the
+  form's submit.
 
 **Toasts**: already mounted in `src/App.tsx`. Call
 `showToast({ title, description?, tone? })` from `src/components/toast.tsx`.
@@ -91,13 +98,19 @@ after client-side navigation:
 | Select, Tabs, Pagination, Checkbox, Dialog, TextField, RadioGroup, Button, Toast | ✅ work |
 | **Slider** | ❌ ignores keyboard and pointer input. Don't use it (the Chaos Panel uses native range inputs for this reason). |
 
-Dev-console noise that comes from **inside Kobalte**, so don't chase it:
+Dev-console noise that comes from **inside Kobalte**, so don't chase it.
+Several of these name *your* line in the stack, because Kobalte reads the
+prop you passed:
 
 - `[STRICT_READ_UNTRACKED] … in <TextField.ErrorMessage>` (also other
   `.ErrorMessage` parts). The component reads `validationState` in its own
   body. The message still shows and updates correctly.
-- `[EFFECT_RELAY_TEAR] … <TextField.Input> › <Polymorphic>`. Internal to
-  Kobalte's polymorphic wrapper.
+- `[STRICT_READ_UNTRACKED]` on a **controlled** `TextField`'s `value`.
+  Kobalte reads it once in its body; the input still follows your signal.
+- `[EFFECT_RELAY_TEAR]` from `<TextField.Input> › <Polymorphic>`, **Tabs**,
+  **Select**, **Dialog** and `Checkbox.Indicator`.
+- `[EFFECT_WRITES_OWN_SOURCE]` from **Select**, **Dialog** and
+  `Checkbox.Indicator`.
 
-If a diagnostic's stack points into **your** component's code instead, it's
+If the diagnostic is about a signal, memo or effect **you** created, it's
 yours.

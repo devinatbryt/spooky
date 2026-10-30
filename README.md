@@ -112,17 +112,45 @@ ones that bite first:
 4. **Router:** `action` is now **`formAction`**, and `useSubmission` is now
    `useSubmissions(...)`, which holds *settled* submissions. A form bound to a
    form action gets `aria-busy` while in flight, so style it with
-   `group-aria-busy:`. `useSearchParams` reads and writes the URL.
-5. **Effect:** no `effect/unstable/*`, no `Effect.Service`. Services are
-   `Context.Service`. See `EFFECT.md` → The traps.
+   `group-aria-busy:`.
+5. **`useSearchParams` is held until the new data lands.** After
+   `setSearchParams({ page: 2 })`, `params.page` (and even the address bar)
+   still shows the *old* value until the page's data for page 2 has loaded:
+   about 1.5s at 1500ms latency. A control bound to `params.page` therefore
+   looks frozen. Bind controls to **`latest(() => params.page)`** (from
+   `solid-js`), which shows the in-flight value, and let the grid show stale
+   results with `isPending`.
+6. **Server-function arguments travel as JSON.** An object with an
+   `undefined` value (`{ species: undefined }`) is rejected as "not
+   JSON-serializable". The first SSR render calls the function directly, so it
+   works on reload and breaks only on client-side navigation. **Leave absent
+   keys out** rather than setting them to `undefined`.
+7. **A server call that *fails* revalidates nothing.** A successful POST
+   refreshes every `query` on screen; a failed one doesn't. If a failure
+   means your screen is now out of date (`AlreadyAdopted`: someone else
+   changed that monster), call `revalidate(getThing.keyFor(id))` yourself.
+8. **`aria-busy` is styling, not a lock.** It doesn't stop a second submit
+   (Enter in a field, a fast double click). Guard double submits yourself.
+9. **Form-action hooks live and die with their component.** An
+   `.onSettled(...)` registered inside a component that success *unmounts*
+   (the form, replaced by "Adopted!") never fires for that success. Register it
+   in a parent that stays mounted.
+10. **Effect:** no `effect/unstable/*`, no `Effect.Service`. Services are
+    `Context.Service`. See `EFFECT.md` → The traps.
 
 ## Known rough edges (none of these are your bug)
 
 - **Kobalte's Slider is broken** in alpha.4. Everything else you need works;
   see `KOBALTE.md`.
-- **Two Kobalte diagnostics show up in the dev console** (`STRICT_READ_UNTRACKED`
-  in `.ErrorMessage`, `EFFECT_RELAY_TEAR` in `TextField.Input`). They come from
-  inside Kobalte.
+- **Kobalte logs several Solid diagnostics of its own** in the dev console
+  (`STRICT_READ_UNTRACKED`, `EFFECT_RELAY_TEAR`, `EFFECT_WRITES_OWN_SOURCE`
+  from TextField, Tabs and Select). They're harmless; `KOBALTE.md` lists them.
+- **`LONG_HOLD` warnings at high latency are expected.** At 1500ms the
+  router holds a navigation long enough for Solid to mention it. That's the
+  Chaos Panel doing its job.
+- **Don't put `<Title>` inside a `<Loading>`.** Under streaming SSR it causes
+  a hydration key miss. Put it at the top of the page component, outside any
+  boundary.
 - **A typed failure is an HTTP 500**, so the browser console logs
   "Failed to load resource: 500" for every rejected form submission. That's
   the transport, not a crash.
