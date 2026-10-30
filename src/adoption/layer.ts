@@ -12,7 +12,6 @@
 import { Layer, Context, Effect, Schema, SchemaIssue } from 'effect';
 import { MonsterRepo } from '../server/monster-repo';
 import { BackgroundCheck } from '../server/background-check';
-import { Chaos } from '../server/chaos';
 import { Housing, type Monster } from '../shared/monster';
 import { ChaosRejected, MonsterNotFound } from '../shared/errors';
 
@@ -65,7 +64,7 @@ export class ApplicationRejected extends Schema.TaggedError<ApplicationRejected>
     }
 }
 
-export const AdoptionLayer = Layer.mergeAll(MonsterRepo.layer, BackgroundCheck.layer, Chaos.layer);
+export const AdoptionLayer = Layer.mergeAll(MonsterRepo.layer, BackgroundCheck.layer);
 
 const formatIssues = SchemaIssue.makeFormatterStandardSchemaV1()
 
@@ -79,7 +78,6 @@ export class AdoptionDesk extends Context.Service<
         AdoptionDesk,
         Effect.gen(function* () {
             const monsterRepo = yield* MonsterRepo
-            const chaos = yield* Chaos
             const backgroundCheck = yield* BackgroundCheck
             return AdoptionDesk.of({
                 apply: (formData) => Effect.gen(function* () {
@@ -96,39 +94,32 @@ export class AdoptionDesk extends Context.Service<
                     const monster = yield* monsterRepo.get(input.monster_id);
 
                     if (monster.species === 'vampire' && ['house-with-yard', 'apartment'].includes(input.housing)) {
-                        return yield* Effect.fail(
-                            new ApplicationRejected({
-                                reason: 'Vampire can only live in a crypt or haunted mansion.'
-                            })
-                        )
+                        return yield* new ApplicationRejected({
+                            reason: 'Vampire can only live in a crypt or haunted mansion.'
+                        })
+
                     }
                     if (monster.species === 'vampire' && input.keeps_garlic) {
-                        return yield* Effect.fail(
-                            new ApplicationRejected({
-                                reason: 'Vampires cannot live with garlic.'
-                            })
-                        )
+                        return yield* new ApplicationRejected({
+                            reason: 'Vampires cannot live with garlic.'
+                        })
+
                     }
                     if (monster.species === 'werewolf' && input.housing !== 'house-with-yard') {
-                        return yield* Effect.fail(
-                            new ApplicationRejected({
-                                reason: 'Werewolves cannot live in a house without a yard.'
-                            })
-                        )
+                        return yield* new ApplicationRejected({
+                            reason: 'Werewolves cannot live in a house without a yard.'
+                        })
                     }
                     if (monster.species === 'zombie' && input.housing !== 'apartment') {
-                        return yield* Effect.fail(
-                            new ApplicationRejected({
-                                reason: 'Zombies cannot live in an apartment.'
-                            })
-                        )
+                        return yield* new ApplicationRejected({
+                            reason: 'Zombies cannot live in an apartment.'
+                        })
+
                     }
                     if (monster.species === 'mummy' && input.housing !== 'crypt') {
-                        return yield* Effect.fail(
-                            new ApplicationRejected({
-                                reason: 'Mummies can only live in a crypt'
-                            })
-                        )
+                        return yield* new ApplicationRejected({
+                            reason: 'Mummies can only live in a crypt'
+                        })
                     }
 
                     const saved_monster = yield* monsterRepo.save({
