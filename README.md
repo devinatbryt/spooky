@@ -158,6 +158,12 @@ ones that bite first:
   one unless they're marked safe. `runServer` already does this
   (`markSafeError`). If you ever throw from a server function *without*
   `runServer`, your `_tag` vanishes in `pnpm build` but not in `pnpm dev`.
+- **"Failed to fetch dynamically imported module: …/node_modules/.vite/deps/…"**
+  means the tab is older than the dev server. After `pnpm dev` restarts (or
+  re-bundles its dependencies), an open tab keeps its old dependency version
+  stamp. Everything it already loaded keeps working, so the first *lazy*
+  import (often the first form submit) is what fails, with a 504. Hard-reload
+  the tab (Ctrl/Cmd+Shift+R).
 - **`curl` gets a 404 from the dev server** unless you send `Accept: text/html`.
 - **`latest` npm tags lie:** `solid-js@latest` is 1.9. Every version is pinned
   exactly and the lockfile is committed. Don't run `pnpm update`.
