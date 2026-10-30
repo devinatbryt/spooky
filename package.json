@@ -1,0 +1,50 @@
+{
+  "name": "spooky",
+  "version": "0.0.0",
+  "description": "Solid 2 + Effect 4 + Kobalte pair-programming jam: the Monster Adoption Agency",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "node server.js",
+    "serve": "vite preview",
+    "test": "vitest",
+    "lint": "oxlint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kobalte/core": "2.0.0-alpha.4",
+    "@solidjs/meta": "1.0.0-next.2",
+    "@solidjs/router": "2.0.0-next.41",
+    "@solidjs/web": "2.0.0-rc.16",
+    "effect": "4.1.0",
+    "solid-js": "2.0.0-rc.16"
+  },
+  "devDependencies": {
+    "@effect/vitest": "4.1.0",
+    "@solidjs/diagnostics": "2.0.0-rc.16",
+    "@solidjs/vite-plugin": "3.0.0-next.51",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "26.4.1",
+    "eslint-plugin-solid": "0.17.0",
+    "filesystem-routing": "0.4.1",
+    "oxlint": "1.79.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vite": "8.2.2",
+    "vitest": "5.0.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "@solidjs/signals": "2.0.0-rc.16",
+      "@solidjs/compiler": "2.0.0-rc.16",
+      "@solidjs/babel-plugin": "2.0.0-rc.16"
+    }
+  },
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=22.19"
+  }
+}

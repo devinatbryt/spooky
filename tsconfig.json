@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    // General
+    "jsx": "preserve",
+    "jsxImportSource": "@solidjs/web",
+    "target": "ESNext",
+
+    // Modules
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+
+    // Type Checking & Safety (Effect 4 requires strict)
+    "strict": true,
+    "exactOptionalPropertyTypes": false,
+    "skipLibCheck": true,
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src", "*.ts", "file-routes.d.ts"]
+}

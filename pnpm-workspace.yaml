@@ -1,0 +1,9 @@
+# pnpm settings for this project. Everything here is a prerelease or a
+# days-old release, so the whole stack is excluded from any minimumReleaseAge
+# policy. Versions are pinned exactly in package.json — do not `pnpm update`.
+minimumReleaseAgeExclude:
+  - solid-js
+  - '@solidjs/*'
+  - '@kobalte/*'
+  - effect
+  - '@effect/*'
