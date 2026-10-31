@@ -9,8 +9,6 @@ import { For } from 'solid-js';
 import { HOUSING_LABELS } from '../../shared/monster';
 import { Record as Rec } from 'effect';
 
-const HousingLabels = HOUSING_LABELS
-
 // ===========================================================================
 //  THE ADOPTION DESK STARTS HERE — Devin & Gabriel.
 //
