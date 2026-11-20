@@ -43,6 +43,17 @@ export class BackgroundCheck extends Context.Service<
     ) => Effect.Effect<BackgroundCheckReport, BackgroundCheckFlaked>;
   }
 >()('spooky/BackgroundCheck') {
+  static readonly testLayer = Layer.succeed(
+    BackgroundCheck,
+    BackgroundCheck.of(
+      {
+        run: (applicantName) =>
+          Effect.succeed({
+            applicantName, verdict: 'clear', note: 'Nothing on file.'
+          })
+      }
+    )
+  )
   static readonly layer = Layer.succeed(
     BackgroundCheck,
     BackgroundCheck.of({
@@ -64,3 +75,4 @@ export class BackgroundCheck extends Context.Service<
     }),
   );
 }
+

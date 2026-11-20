@@ -21,7 +21,7 @@ import 'server-only';
 import { Cause, Effect, Exit, Layer, ManagedRuntime, Option } from 'effect';
 import { getRequestEvent, markSafeError } from '@solidjs/web';
 
-import { AdoptionLayer } from '../adoption/layer';
+import { AdoptionDesk, AdoptionLayer } from '../adoption/layer';
 import { CatalogLayer } from '../catalog/layer';
 import { PumpkinPatch } from '../example/pumpkin-patch';
 import { BackgroundCheck } from './background-check';
@@ -38,7 +38,7 @@ export const InfraLayer = Layer.mergeAll(MonsterRepo.layer, BackgroundCheck.laye
  * layer file (src/catalog/layer.ts, src/adoption/layer.ts) — never here — so
  * the two branches never touch the same line and merge cleanly.
  */
-export const AppLayer = Layer.mergeAll(CatalogLayer, AdoptionLayer, PumpkinPatch.layer).pipe(
+export const AppLayer = Layer.mergeAll(CatalogLayer, AdoptionDesk.layer, PumpkinPatch.layer).pipe(
   Layer.provideMerge(InfraLayer),
 );
 

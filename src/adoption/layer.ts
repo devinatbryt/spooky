@@ -9,33 +9,41 @@
 // you by the runtime — you do not provide it here.
 //
 // Only the Adoption Desk pair edits this file.
-import { Layer, Context, Effect, Schema, SchemaIssue } from 'effect';
+import { Layer, Context, Effect, Schema, SchemaIssue, SchemaTransformation } from 'effect';
 import { MonsterRepo } from '../server/monster-repo';
-import { BackgroundCheck } from '../server/background-check';
+import { BackgroundCheck, BackgroundCheckFlaked } from '../server/background-check';
 import { Housing, type Monster } from '../shared/monster';
 import { ChaosRejected, MonsterNotFound } from '../shared/errors';
 
-const ApplyRequest = Schema.fromFormData(
-    Schema.toCodecStringTree(
-        Schema.Struct({
-            monster_id: Schema.String,
-            housing: Housing,
-            name: Schema.Trim.pipe(
-                Schema.check(
-                    Schema.isMinLength(2, { message: 'Tell us who you are (2+ characters).' }),
-                    Schema.isMaxLength(40, { message: 'Keep it under 40 characters.' })
-                )
-            ),
-            keeps_garlic: Schema.Boolean.pipe(
-                Schema.withDecodingDefault(Effect.succeed(false)),
-                Schema.withConstructorDefault(Effect.succeed(false))
-            ),
-            accepts_being_haunted: Schema.Boolean.pipe(
-                Schema.withDecodingDefaultTypeKey(Effect.succeed(false)),
-                Schema.check(Schema.makeFilter((b: boolean) => b || 'You must accept being haunted'))
-            )
+const CheckboxToBoolean = Schema.Literals(["on", "off"]).pipe(
+    Schema.decodeTo(
+        Schema.Boolean,
+        SchemaTransformation.transform({
+            decode: (input) => input === "on",
+            encode: (output) => output ? "on" : "off"
         })
     )
+)
+
+const ApplyRequest = Schema.fromFormData(
+    Schema.Struct({
+        monster_id: Schema.String,
+        housing: Housing,
+        name: Schema.Trim.pipe(
+            Schema.check(
+                Schema.isMinLength(2, { message: 'Tell us who you are (2+ characters).' }),
+                Schema.isMaxLength(40, { message: 'Keep it under 40 characters.' })
+            )
+        ),
+        keeps_garlic: CheckboxToBoolean.pipe(
+            Schema.withDecodingDefault(Effect.succeed("off")),
+            Schema.withConstructorDefault(Effect.succeed(false))
+        ),
+        accepts_being_haunted: CheckboxToBoolean.pipe(
+            Schema.withDecodingDefaultTypeKey(Effect.succeed(false)),
+            Schema.check(Schema.makeFilter((b: boolean) => b || 'You must accept being haunted'))
+        )
+    })
 )
 
 /** Bad input. `field` names the form field so the UI can put the message next to it. */
@@ -64,14 +72,14 @@ export class ApplicationRejected extends Schema.TaggedError<ApplicationRejected>
     }
 }
 
-export const AdoptionLayer = Layer.mergeAll(MonsterRepo.layer, BackgroundCheck.layer);
+export const AdoptionLayer = Layer.mergeAll(MonsterRepo.layer, BackgroundCheck.testLayer);
 
 const formatIssues = SchemaIssue.makeFormatterStandardSchemaV1()
 
 export class AdoptionDesk extends Context.Service<
     AdoptionDesk,
     {
-        apply: (formData: FormData) => Effect.Effect<Monster, InvalidApplication | ApplicationRejected | MonsterNotFound | ChaosRejected>
+        apply: (formData: FormData) => Effect.Effect<Monster, InvalidApplication | ApplicationRejected | MonsterNotFound | ChaosRejected | BackgroundCheckFlaked>
     }
 >()('spooky/adoption/AdoptionDesk') {
     static readonly layer = Layer.effect(
@@ -83,6 +91,7 @@ export class AdoptionDesk extends Context.Service<
                 apply: (formData) => Effect.gen(function* () {
                     const input = yield* Schema.decodeEffect(ApplyRequest)(formData).pipe(
                         Effect.mapError((e) => {
+                            console.log(e)
                             const [first] = formatIssues(e.issue).issues
                             const field = first?.path?.[0]
                             return new InvalidApplication({
@@ -91,6 +100,15 @@ export class AdoptionDesk extends Context.Service<
                             })
                         })
                     );
+
+                    const result = yield* backgroundCheck.run(input.name)
+
+                    if (result.verdict === 'flagged') {
+                        return yield* new ApplicationRejected({
+                            reason: result.note
+                        })
+                    }
+
                     const monster = yield* monsterRepo.get(input.monster_id);
 
                     if (monster.species === 'vampire' && ['house-with-yard', 'apartment'].includes(input.housing)) {

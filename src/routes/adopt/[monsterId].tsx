@@ -1,13 +1,16 @@
 import { Title } from '@solidjs/meta';
-import { useParams } from '@solidjs/router';
+import { useParams, useSubmissions } from '@solidjs/router';
 import { RadioGroup } from '@kobalte/core/radio-group';
 import { Checkbox } from '@kobalte/core/checkbox';
 import { TextField } from '@kobalte/core/text-field';
 import { Button } from '@kobalte/core/button';
 import { Dialog } from '@kobalte/core/dialog';
-import { For } from 'solid-js';
+import { createMemo, For } from 'solid-js';
 import { HOUSING_LABELS } from '../../shared/monster';
 import { Record as Rec } from 'effect';
+import { adoptMonster } from '../../adoption/api';
+import { isTagged } from '../../shared/errors';
+import { showToast } from '../../components/toast';
 
 // ===========================================================================
 //  THE ADOPTION DESK STARTS HERE — Devin & Gabriel.
@@ -18,15 +21,71 @@ import { Record as Rec } from 'effect';
 
 export default function AdoptPage() {
   const params = useParams<{ monsterId: string }>();
+  const submissions = useSubmissions(adoptMonster)
+  const latest = createMemo(() => submissions?.at(-1))
+
+  const fieldError = (field: string) => {
+    const error = latest()?.error;
+    return isTagged(error, 'InvalidApplication') && error.field === field ? error.message : undefined;
+  };
+
+
+
+  const adopt = adoptMonster.onSettled((submission) => {
+    const error = submission.error;
+    if (error && !isTagged(error, "InvalidApplication")) {
+      if (isTagged(error, 'ApplicationRejected')) {
+        return showToast({
+          title: "Rejected application",
+          description: error.message,
+          tone: "error"
+        })
+      }
+
+      if (isTagged(error, "MonsterNotFound")) {
+        return showToast({
+          title: "Monster not found",
+          description: error.message,
+          tone: "error"
+        })
+      }
+
+      if (isTagged(error, "ChaosRejected")) {
+        return showToast({
+          title: "Random failure",
+          description: error.message,
+          tone: "error"
+        })
+      }
+
+      if (isTagged(error, "BackgroundCheckFlaked")) {
+        return showToast({
+          title: "Something went wrong",
+          tone: "error"
+        })
+      }
+
+      return;
+    }
+
+    if (submission.result) {
+      return showToast({
+        title: `You've adopted ${submission.result.name}`,
+        tone: "success"
+      })
+    }
+  })
+
   return (
     <main class="mx-auto max-w-3xl p-6 pb-40">
       <Title>Adopt · Monster Adoption Agency</Title>
       <section class="p-10">
-        <form method="post" class="group space-y-5 rounded-xl border border-line bg-surface-2 p-6">
-          <TextField required name="pickedBy" class="flex flex-col gap-1.5">
+        <form action={adopt} method="post" class="group space-y-5 rounded-xl border border-line bg-surface-2 p-6">
+          <input name="monster_id" value={params.monsterId} type="hidden" />
+          <TextField required name="name" class="flex flex-col gap-1.5">
             <TextField.Label class="text-sm font-medium">Your name</TextField.Label>
             <TextField.Input class="rounded-lg border border-line bg-surface px-3 py-2 outline-none focus:border-accent data-invalid:border-blood" />
-            {/* <TextField.ErrorMessage class="text-sm text-blood">{fieldError('pickedBy')}</TextField.ErrorMessage> */}
+            {/* <TextField.ErrorMessage class="text-sm text-blood">{fieldError('name')}</TextField.ErrorMessage> */}
           </TextField>
           <RadioGroup name="housing" required class="flex flex-col gap-4">
             <RadioGroup.Label class="text-sm font-medium">Size</RadioGroup.Label>
