@@ -10,7 +10,8 @@
 //
 // This is the ONLY file outside src/catalog and src/routes/monsters that the
 // Catalog pair edits, and only the Catalog pair edits it.
-import { Layer, Context, Effect, Schema } from 'effect';
+import { Layer, Context, Effect, Schema, SchemaIssue } from 'effect';
+import { MonsterRepo } from '../server/monster-repo';
 import type { Monster } from '../shared/monster';
 import { MonsterNotFound } from '../shared/errors';
 import { Species } from '../shared/monster';
@@ -23,6 +24,15 @@ type CatalogSearchResult = {
   pages: number;
 }
 
+export class InvalidSearch extends Schema.TaggedError<InvalidSearch>()('InvalidSearch', {
+  field: Schema.String,
+  reason: Schema.String,
+}) {
+  override get message() {
+    return this.reason;
+  }
+}
+
 const Search = Schema.Struct({
   name: Schema.optionalKey(Schema.String),
   species: Schema.optionalKey(Species),
@@ -30,25 +40,57 @@ const Search = Schema.Struct({
   page: Schema.Number.pipe(Schema.withDecodingDefaultKey(Effect.succeed(1)))
 })
 export class MonsterCatalog extends Context.Service<MonsterCatalog, {
-  search: (str: string) => Effect.Effect<CatalogSearchResult>;
-  detail: (id: number) => Effect.Effect<Monster, MonsterNotFound>
+  search: (str: unknown) => Effect.Effect<CatalogSearchResult, InvalidSearch>;
+  detail: (id: string) => Effect.Effect<Monster, MonsterNotFound>
 }>()('spooky/MonsterCatalog') {
-  //
 }
+
+const searchIssues = SchemaIssue.makeFormatterStandardSchemaV1()
 
 export const CatalogLayer = Layer.effect(
     MonsterCatalog,
     Effect.gen(function*(){
+        const monsters = yield* MonsterRepo;
+        const allMonsters = yield* monsters.list;
+
         return MonsterCatalog.of({
             search: (str) => Effect.gen(function*(){
-                Schema.decodeUnknownSync(Search)(str)
+                const decodedSearch = yield* Schema.decodeUnknownEffect(Search)(str).pipe(
+                  Effect.mapError((err) => {
+                    const [first] = searchIssues(err.issue).issues;
+                    const field = first?.path?.[0]
+                    return new InvalidSearch({
+                      field: typeof field === 'object' ? String(field.key) : String(field ?? 'form'),
+                      reason: first?.message ?? 'That search did not make sense.',
+                    })
+                  })
+                )
+                
+                const {name, species, status, page} = decodedSearch; 
+
+                const filteredMonsters = allMonsters.filter((monster) => {
+                  monster.name.toLowerCase().includes(name?.toLowerCase() ?? '') &&
+                  (species ? monster.species === species : true) &&
+                  status === 'all' ? true : monster.status === status
+                })
+
+                const pageSize = 8;
+                const total = filteredMonsters.length;
+
+                const pages = Math.ceil(total / pageSize) 
+
                 return {
-                    monsters: [],
-                    total: 1,
-                    pages: 1,
+                    monsters: filteredMonsters,
+                    total,
+                    pages,
                 }
             }),
-            detail: (id) => Effect.gen(function*(){})
+            detail: (id) => Effect.gen(function*(){
+              const single = yield* monsters.get(id)
+              return single ? single : yield* new MonsterNotFound({
+                id: id
+              });
+            })
         })
     })
 
