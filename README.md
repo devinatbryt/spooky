@@ -1,6 +1,6 @@
 # 🎃 Spooky: the Monster Adoption Agency
 
-A two-hour pair-programming jam on **Solid 2.0 RC**, **Effect 4** and
+A two-hour pair-programming jam on **Solid 2.0**, **Effect 4** and
 **Kobalte**. Two pairs, **two different slices** of one app, merged at the end.
 
 | Pair | Slice | Start at |
@@ -28,7 +28,7 @@ assistant reads.
 | **`SPEC.md`** | What to build, per slice and per rotation. Behaviour only. |
 | **`EFFECT.md`** | Effect 4.1 cheatsheet, including the v3→v4 traps the internet will walk you into. |
 | **`KOBALTE.md`** | Imports, component anatomy, styling, known alpha bugs. |
-| **`SOLID2.md`** | The full Solid 2 cheatsheet, vendored from the installed rc.16. |
+| **`SOLID2.md`** | The full Solid 2 cheatsheet, vendored from the installed 2.0.3. |
 | **`DESIGN.md`** | Tailwind class strings, so nobody bikesheds spacing. |
 | **`src/example/` + `/example`** | One Effect service end to end, on pumpkins. Copy the shape, not the code. |
 
@@ -140,7 +140,8 @@ ones that bite first:
 
 ## Known rough edges (none of these are your bug)
 
-- **Kobalte's Slider is broken** in alpha.4. Everything else you need works;
+- **Kobalte's Slider is broken** (alpha.4; alpha.5 doesn't fix it). Everything
+  else you need works;
   see `KOBALTE.md`.
 - **Kobalte logs several Solid diagnostics of its own** in the dev console
   (`STRICT_READ_UNTRACKED`, `EFFECT_RELAY_TEAR`, `EFFECT_WRITES_OWN_SOURCE`
@@ -165,16 +166,16 @@ ones that bite first:
   import (often the first form submit) is what fails, with a 504. Hard-reload
   the tab (Ctrl/Cmd+Shift+R).
 - **`curl` gets a 404 from the dev server** unless you send `Accept: text/html`.
-- **`latest` npm tags lie:** `solid-js@latest` is 1.9. Every version is pinned
+- **`latest` npm tags lie:** `@kobalte/core@latest` is 0.13, for Solid 1. Every version is pinned
   exactly and the lockfile is committed. Don't run `pnpm update`.
 
 ## Stack
 
-`solid-js` / `@solidjs/web` **2.0.0-rc.16** · `@solidjs/router` 2.0.0-next.41 ·
-`@solidjs/vite-plugin` 3.0.0-next.51 (start mode: streaming SSR, `'use server'`)
-· `effect` **4.1.0** · `@kobalte/core` **2.0.0-alpha.4** · Tailwind 4.3 ·
+`solid-js` / `@solidjs/web` **2.0.3** · `@solidjs/router` 2.0.1 ·
+`@solidjs/vite-plugin` 3.0.1 (start mode: streaming SSR, `'use server'`)
+· `effect` **4.1.5** · `@kobalte/core` **2.0.0-alpha.5** · Tailwind 4.3 ·
 Vite 8 · Vitest 5. Not SolidStart, which is still Solid 1.
 
-Solid docs: **https://v2.solidjs.com** (`docs.solidjs.com` is 1.x and will
-mislead you). Effect: https://effect.website (cross-check against `EFFECT.md`).
+Solid docs: **https://docs.solidjs.com** (2.0 now; the 1.x docs moved to
+`v1.solidjs.com` and will mislead you). Effect: https://effect.website (cross-check against `EFFECT.md`).
 Kobalte: https://kobalte.dev.

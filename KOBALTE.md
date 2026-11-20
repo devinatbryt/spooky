@@ -1,8 +1,8 @@
 # Kobalte — what you need for this repo
 
-Installed: **`@kobalte/core@2.0.0-alpha.4`**, the first Solid 2 build. Its
-peer is exactly `solid-js@2.0.0-rc.16`, which is why the whole Solid
-toolchain is pinned there. Kobalte is **headless**: it gives you behaviour,
+Installed: **`@kobalte/core@2.0.0-alpha.5`**, a Solid 2 build (peer
+`solid-js@^2.0.0`). `@kobalte/core@latest` is still 0.13, for Solid 1, so
+install it pinned. Kobalte is **headless**: it gives you behaviour,
 focus management and ARIA, and you bring every class.
 
 Docs: https://kobalte.dev. They're written for 0.13 / Solid 1, but the
@@ -88,10 +88,11 @@ a `name` and it posts with a `<form>` like a native input.
 
 ---
 
-## Known issues in alpha.4 (not your bug)
+## Known issues (not your bug)
 
-Checked in a real browser on this repo, both after a hard page load and
-after client-side navigation:
+Checked in a real browser on this repo against alpha.4, both after a hard
+page load and after client-side navigation. alpha.5's changelog fixes none
+of them:
 
 | Component | Status |
 |---|---|
