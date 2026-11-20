@@ -18,9 +18,9 @@ export default defineConfig({
       // Dev-only diagnostics surface at /__solid/diagnostics. No-op in build.
       diagnostics: true,
       // Compiles 'use server' functions into fetch calls on the client and
-      // serves them from /_server. The configure module registers the
+      // serves them from /_server. The serverSetup module registers the
       // router's single-flight collector (see src/server-config.ts).
-      serverFunctions: { configure: './src/server-config.ts' },
+      serverFunctions: { serverSetup: './src/server-config.ts' },
       // Also compile the `?pick=` route modules the fileRoutes plugin emits.
       extensions: ['.jsx', '.tsx'],
     }),
