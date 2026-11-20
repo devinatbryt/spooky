@@ -42,8 +42,7 @@ const Search = Schema.Struct({
 export class MonsterCatalog extends Context.Service<MonsterCatalog, {
   search: (str: unknown) => Effect.Effect<CatalogSearchResult, InvalidSearch>;
   detail: (id: string) => Effect.Effect<Monster, MonsterNotFound>
-}>()('spooky/MonsterCatalog') {
-}
+}>()('spooky/MonsterCatalog') {}
 
 const searchIssues = SchemaIssue.makeFormatterStandardSchemaV1()
 

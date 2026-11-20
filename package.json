@@ -19,6 +19,7 @@
     "@solidjs/meta": "2.0.0",
     "@solidjs/router": "2.0.1",
     "@solidjs/web": "2.0.3",
+    "@tybys/wasm-util": "^0.10.5",
     "effect": "4.1.5",
     "solid-js": "2.0.3"
   },
