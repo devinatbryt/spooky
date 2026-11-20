@@ -97,7 +97,7 @@ export default function ExamplePage() {
         <TextField name="pickedBy" validationState={fieldError('pickedBy') ? 'invalid' : 'valid'} class="flex flex-col gap-1.5">
           <TextField.Label class="text-sm font-medium">Your name</TextField.Label>
           <TextField.Input class="rounded-lg border border-line bg-surface px-3 py-2 outline-none focus:border-accent data-invalid:border-blood" />
-          {/* Dev console: Kobalte alpha.4 logs STRICT_READ_UNTRACKED here. It
+          {/* Dev console: Kobalte's 2.0 alphas log STRICT_READ_UNTRACKED here. It
               comes from inside Kobalte, not this line — see KOBALTE.md. */}
           <TextField.ErrorMessage class="text-sm text-blood">{fieldError('pickedBy')}</TextField.ErrorMessage>
         </TextField>

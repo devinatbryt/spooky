@@ -1,7 +1,7 @@
 # Effect 4 — the cheatsheet for this repo
 
-Everything here was checked against the installed **`effect@4.1.0`** (released
-2026-10-29). Effect 4 renamed a lot from 3.x, and most blog posts, docs pages
+Everything here was checked against the installed **`effect@4.1.5`** (released
+2026-11-20). Effect 4 renamed a lot from 3.x, and most blog posts, docs pages
 and AI answers are still 3.x. When they disagree with this file, this file
 wins.
 
@@ -12,7 +12,7 @@ almost everything below, once.
 
 ## The traps (read these first)
 
-| You'll see this online | In 4.1.0 it is |
+| You'll see this online | In 4.1 it is |
 |---|---|
 | `import … from "effect/unstable/http"` (any `effect/unstable/*`) | **Does not exist.** Modules live directly under `effect/` (`effect/http`, `effect/rpc`, …). You won't need them here. |
 | `class X extends Effect.Service<X>()("X", { … })` | **Gone.** `class X extends Context.Service<X, Shape>()("X") {}` plus a `static layer`. |
@@ -22,7 +22,7 @@ almost everything below, once.
 | `Schema.minLength(2)` in a `pipe` | `Schema.String.pipe(Schema.check(Schema.isMinLength(2)))` |
 | `Schema.decodeUnknown(schema)` | `Schema.decodeUnknownEffect(schema)`, or `decodeUnknownSync` (throws). |
 | `TestClock` from `effect` | `import { TestClock } from "effect/testing"` |
-| `vitest` 3/4 | `@effect/vitest@4.1.0` needs **vitest 5** (installed). |
+| `vitest` 3/4 | `@effect/vitest@4.1.5` needs **vitest 5** (installed). |
 
 ---
 

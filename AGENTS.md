@@ -34,7 +34,7 @@ The rest of this file is background for answering accurately.
 
 ## Version facts: trust these over memory
 
-**Effect is 4.1.0.** Most of what you remember is 3.x:
+**Effect is 4.1.5.** Most of what you remember is 3.x:
 
 - There is **no `effect/unstable/*`**; modules live directly under `effect/`.
 - `Effect.Service` and `Context.Tag` are gone. Services are
@@ -48,13 +48,14 @@ The rest of this file is background for answering accurately.
 - Read `EFFECT.md` before answering anything Effect-specific. The JSDoc in
   `node_modules/effect/dist/*.d.ts` is the source of truth.
 
-**Solid is 2.0.0-rc.16.** Read `SOLID2.md` (vendored from the installed
+**Solid is 2.0.3** (stable). Read `SOLID2.md` (vendored from the installed
 package), especially "What changed from 1.x". Gone or renamed: `createResource`,
 `batch`, `<Suspense>`, `<ErrorBoundary>`, `<Index>`, `produce`, `onMount`,
 `mergeProps`, `splitProps`, `classList`, `use:` directives, single-argument
-`createEffect`. Docs: https://v2.solidjs.com, **not** docs.solidjs.com.
+`createEffect`. Docs: https://docs.solidjs.com (2.0 now; v2.solidjs.com
+redirects there). The 1.x docs moved to v1.solidjs.com: don't use them.
 
-**Router is 2.0.0-next.41:** `action` was renamed **`formAction`**;
+**Router is 2.0.1:** `action` was renamed **`formAction`**;
 `useSubmission` became `useSubmissions` (settled submissions only); forms get
 `aria-busy` automatically while in flight (styling only; it doesn't block a
 second submit). Calling a server function directly from a handler is fine.
@@ -64,7 +65,7 @@ navigation's data lands; read `latest(() => params.x)` for the in-flight
 value. Server-function arguments are JSON, so `undefined` values are rejected.
 See README → "Solid 2 is not Solid 1" for the full list.
 
-**Kobalte is 2.0.0-alpha.4:** per-component imports only
+**Kobalte is 2.0.0-alpha.5:** per-component imports only
 (`@kobalte/core/select`). The Slider is broken. `STRICT_READ_UNTRACKED` in
 `.ErrorMessage` and `EFFECT_RELAY_TEAR` in `TextField.Input` are Kobalte's own
 dev warnings. See `KOBALTE.md`.
