@@ -103,7 +103,7 @@ function ChaosSlider(props: {
         <span class="text-white tabular-nums">{props.format(props.value)}</span>
       </label>
       {/* A native range input on purpose: Kobalte's Slider ignores keyboard
-          and pointer input in 2.0.0-alpha.4 (see KOBALTE.md). `onInput` moves
+          and pointer input in the 2.0 alphas (see KOBALTE.md). `onInput` moves
           the local value; `onChange` fires on release (or per key press) and
           schedules the commit. */}
       <input
